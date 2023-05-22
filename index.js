@@ -7,7 +7,7 @@ const port = 3000; // Replace with your desired port number
 
 const mongoURI = 'mongodb+srv://haraki:Bethebest123!@cluster0.bgr1lex.mongodb.net/?retryWrites=true&w=majority'; // Replace with your MongoDB URI
 const dbName = 'bitbank'; // Replace with your database name
-const collectionName = 'exchagne'; // Replace with your collection name
+const collectionName = 'exchange'; // Replace with your collection name
 
 const web3 = new Web3(new Web3.providers.HttpProvider('https://erpc.apothem.network'));
 const exchangeAddress = '0x2f78fc77fF3DfeFD469af6e21D2d1ad84216BC9c'; // Replace with your smart contract address
