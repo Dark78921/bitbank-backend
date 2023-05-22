@@ -9,11 +9,12 @@ const mongoURI = 'mongodb+srv://haraki:Bethebest123!@cluster0.bgr1lex.mongodb.ne
 const dbName = 'bitbank'; // Replace with your database name
 const collectionName = 'exchange'; // Replace with your collection name
 
-const web3 = new Web3('https://erpc.apothem.network'); // Replace with your Infura project ID or Ethereum node URL
+// const web3 = new Web3('https://erpc.apothem.network'); // Replace with your Infura project ID or Ethereum node URL
+const web3 = new Web3(new Web3.providers.WebsocketProvider('wss://ws.apothem.network'));
 const contractAddress = '0x2f78fc77fF3DfeFD469af6e21D2d1ad84216BC9c'; // Replace with your smart contract address
 const exchangeABI = require("./abi/bitbank.json"); // Replace with your smart contract ABI
 
-app.get('/data', async (req, res) => {
+app.get('/exchange', async (req, res) => {
   try {
     const client = new MongoClient(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true });
     await client.connect();
