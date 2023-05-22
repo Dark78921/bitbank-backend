@@ -41,6 +41,8 @@ async function initialize() {
                     let ratesData = await exchangeRatesContract.methods.effectiveValueAndRates(event.returnValues.fromCurrencyKey, event.returnValues.fromAmount, event.returnValues.toCurrencyKey).call();
                     let fromAmountInUSD = event.returnValues.fromAmount * ratesData.sourceRate / 10 ** 36;
                     let toAmountInUSD = event.returnValues.toAmount  * ratesData.destinationRate / 10 ** 36;
+                    let timestamp = new Date();
+                    timestamp = Math.floor(timestamp / 1000);
                     let data ={
                         account: event.returnValues.account,
                         fromSynth: event.returnValues.fromCurrencyKey,
@@ -50,7 +52,8 @@ async function initialize() {
                         toAmount: event.returnValues.toAmount / 10 ** 18,
                         toAmountInUSD: toAmountInUSD,
                         feesInUSD: fromAmountInUSD - toAmountInUSD,
-                        hash: event.transactionHash
+                        hash: event.transactionHash,
+                        timestamp: timestamp
                     }
                     await collection.insertOne(data);
                     console.log('Event data stored successfully:', data);
