@@ -39,16 +39,15 @@ async function initialize() {
             events.forEach(async (event) => {
                 try {
                     let ratesData = await exchangeRatesContract.methods.effectiveValueAndRates(event.returnValues.fromCurrencyKey, event.returnValues.fromAmount, event.returnValues.toCurrencyKey).call();
-                    console.log(ratesData);
-                    let fromAmountInUSD = event.returnValues.fromAmount * ratesData.sourceRate;
-                    let toAmountInUSD = event.returnValues.toAmount  * ratesData.destinationRate;
+                    let fromAmountInUSD = event.returnValues.fromAmount * ratesData.sourceRate / 10 ** 36;
+                    let toAmountInUSD = event.returnValues.toAmount  * ratesData.destinationRate / 10 ** 36;
                     let data ={
                         account: event.returnValues.account,
                         fromSynth: event.returnValues.fromCurrencyKey,
-                        fromAmount: event.returnValues.fromAmount,
+                        fromAmount: event.returnValues.fromAmount / 10 ** 18,
                         fromAmountInUSD: fromAmountInUSD,
                         toSynth: event.returnValues.toCurrencyKey,
-                        toAmount: event.returnValues.toAmount,
+                        toAmount: event.returnValues.toAmount / 10 ** 18,
                         toAmountInUSD: toAmountInUSD,
                         feesInUSD: fromAmountInUSD - toAmountInUSD,
                         hash: event.transactionHash
