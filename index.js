@@ -10,11 +10,14 @@ const dbName = 'bitbank'; // Replace with your database name
 const collectionName = 'exchange'; // Replace with your collection name
 
 const web3 = new Web3(new Web3.providers.HttpProvider('https://erpc.apothem.network'));
-const exchangeAddress = '0x2f78fc77fF3DfeFD469af6e21D2d1ad84216BC9c'; // Replace with your smart contract address
+const exchangeAddress = '0x2f78fc77fF3DfeFD469af6e21D2d1ad84216BC9c';
+const exchangeRatesAddress = "0x9739146C93a21277F84B8cf60422E9C7f3e0BBF9";
 const exchangeABI = require('./abi/bitbank.json'); // Replace with your smart contract ABI
+const exchangeRatesABI = require("./abi/exchangeRates.json");
 
 async function initialize() {
     const exchangeContract = new web3.eth.Contract(exchangeABI, exchangeAddress);
+    const exchangeRatesContract = new web3.eth.Contract(exchangeRatesABI, exchangeRatesAddress);
 
     const client = new MongoClient(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true });
     await client.connect();
@@ -35,6 +38,8 @@ async function initialize() {
 
             events.forEach(async (event) => {
                 try {
+                    // let data = event.returnValues;
+                    console.log(event);
                     await collection.insertOne(event.returnValues);
                     console.log('Event data stored successfully:', event.returnValues);
                 } catch (error) {
