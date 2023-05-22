@@ -58,7 +58,8 @@ app.get('/exchange', async (req, res) => {
         const db = client.db(dbName);
         const collection = db.collection(collectionName);
 
-        const query = { "account": account };
+        const query = { account : account };
+        console.log(query);
 
         const data = await collection.find(query).toArray();
         res.json(data);
