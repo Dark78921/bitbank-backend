@@ -1,6 +1,6 @@
 const express = require('express');
 const { MongoClient } = require('mongodb');
-const { ethers } = require('ethers');
+const Web3 = require('web3');
 
 const app = express();
 const port = 3000; // Replace with your desired port number
@@ -11,11 +11,12 @@ const collectionName = 'exchagne'; // Replace with your collection name
 
 const providerUrl = 'https://erpc.apothem.network'; // Replace with your Infura project ID or provider URL
 const contractAddress = '0x2f78fc77fF3DfeFD469af6e21D2d1ad84216BC9c'; // Replace with your smart contract address
-const exchangeABI = require("./abi/bitbank.json"); // Replace with your smart contract ABI
+const contractABI = require('./abi/bitbank.json'); // Replace with your smart contract ABI
 
 async function initialize() {
-  const provider = new ethers.providers.JsonRpcProvider(providerUrl);
-  const contract = new ethers.Contract(contractAddress, exchangeABI, provider);
+  const provider = new Web3.providers.HttpProvider(providerUrl);
+  const web3 = new Web3(provider);
+  const contract = new web3.eth.Contract(contractABI, contractAddress);
 
   const client = new MongoClient(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true });
   await client.connect();
@@ -23,10 +24,15 @@ async function initialize() {
   const db = client.db(dbName);
   const collection = db.collection(collectionName);
 
-  contract.on('SynthExchange', async (eventData) => {
+  contract.events.SynthExchange({}, async (error, event) => {
+    if (error) {
+      console.error('Error capturing event:', error);
+      return;
+    }
+
     try {
-      await collection.insertOne(eventData);
-      console.log('Event data stored successfully:', eventData);
+      await collection.insertOne(event.returnValues);
+      console.log('Event data stored successfully:', event.returnValues);
     } catch (error) {
       console.error('Error storing event data:', error);
     }
