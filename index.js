@@ -38,9 +38,21 @@ async function initialize() {
 
             events.forEach(async (event) => {
                 try {
-                    // let data = event.returnValues;
-                    console.log(event);
-                    await collection.insertOne(event.returnValues);
+                    let ratesData = exchangeRatesContract.methods.effectiveValueAndRates(event.returnValues.fromCurrencyKey, fromAmount, event.returnValues.toCurrencyKey).call()
+                    let fromAmountInUSD = event.returnValues.fromAmount * ratesData.sourceRate;
+                    let toAmountInUSD = event.returnValues.toAmount  * ratesData.destinationRate;
+                    let data ={
+                        account: event.returnValues.account,
+                        fromSynth: event.returnValues.fromCurrencyKey,
+                        fromAmount: event.returnValues.fromAmount,
+                        fromAmountInUSD: fromAmountInUSD,
+                        toSynth: event.returnValues.toCurrencyKey,
+                        toAmount: event.returnValues.toAmount,
+                        toAmountInUSD: toAmountInUSD,
+                        feesInUSD: fromAmountInUSD - toAmountInUSD,
+                        hash: event.transactionHash
+                    }
+                    await collection.insertOne(data);
                     console.log('Event data stored successfully:', event.returnValues);
                 } catch (error) {
                     console.error('Error storing event data:', error);
