@@ -53,7 +53,8 @@ async function initialize() {
                         feesInUSD: fromAmountInUSD - toAmountInUSD,
                         hash: event.transactionHash
                     }
-                    await collection.insertOne(data);
+                    // await collection.insertOne(data);
+                    console.log(data);
                     console.log('Event data stored successfully:', event.returnValues);
                 } catch (error) {
                     console.error('Error storing event data:', error);
