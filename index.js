@@ -52,16 +52,15 @@ initialize().catch(console.error);
 app.get('/exchange', async (req, res) => {
     try {
         const { account } = req.query;
-        console.log(account);
         const client = new MongoClient(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true });
         await client.connect();
 
         const db = client.db(dbName);
         const collection = db.collection(collectionName);
 
-        const query = { account: account};
+        const query = { account: account };
 
-        const data = await collection.find(query).toArray();
+        const data = await collection.find().toArray();
         res.json(data);
 
         client.close();
