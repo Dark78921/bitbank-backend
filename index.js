@@ -45,10 +45,14 @@ async function initialize() {
                     timestamp = Math.floor(timestamp / 1000);
                     let data ={
                         account: event.returnValues.account,
-                        fromSynth: event.returnValues.fromCurrencyKey,
+                        fromSynth: {
+                            symbol: event.returnValues.fromCurrencyKey,
+                        },
                         fromAmount: event.returnValues.fromAmount / 10 ** 18,
                         fromAmountInUSD: fromAmountInUSD,
-                        toSynth: event.returnValues.toCurrencyKey,
+                        toSynth: {
+                            symbol: event.returnValues.toCurrencyKey,
+                        },
                         toAmount: event.returnValues.toAmount / 10 ** 18,
                         toAmountInUSD: toAmountInUSD,
                         feesInUSD: fromAmountInUSD - toAmountInUSD,
