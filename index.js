@@ -46,12 +46,12 @@ async function initialize() {
                     let data ={
                         account: event.returnValues.account,
                         fromSynth: {
-                            symbol: event.returnValues.fromCurrencyKey,
+                            symbol: web3.toAscii(event.returnValues.fromCurrencyKey),
                         },
                         fromAmount: event.returnValues.fromAmount / 10 ** 18,
                         fromAmountInUSD: fromAmountInUSD,
                         toSynth: {
-                            symbol: event.returnValues.toCurrencyKey,
+                            symbol: web3.toAscii(event.returnValues.toCurrencyKey),
                         },
                         toAmount: event.returnValues.toAmount / 10 ** 18,
                         toAmountInUSD: toAmountInUSD,
