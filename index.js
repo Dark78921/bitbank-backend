@@ -1,6 +1,7 @@
 const express = require('express');
 const { MongoClient } = require('mongodb');
 const Web3 = require('web3');
+const retry = require('async-retry');
 
 const app = express();
 const port = 5000; // Replace with your desired port number
@@ -25,20 +26,59 @@ async function initialize() {
     const db = client.db(dbName);
     const collection = db.collection(collectionName);
 
-    const blockNumber = await web3.eth.getBlockNumber();
+    const blockNumber = await retry(async () => {
+        let curblock = await web3.eth.getBlockNumber();
+        return curblock;
+    }, {
+        retries: 10, // Number of retries
+        factor: 1, // Factor to increase the wait time between retries
+        minTimeout: 1000, // Minimum wait time between retries (in milliseconds)
+        maxTimeout: 5000, // Maximum wait time between retries (in milliseconds)
+        randomize: false // Disable randomization of the wait time
+    });
     let latestBlock = blockNumber;
 
     setInterval(async () => {
-        const currentBlock = await web3.eth.getBlockNumber();
+        const currentBlock = await retry(async () => {
+            const block = await web3.eth.getBlockNumber();
+            if (block <= latestBlock) {
+                throw new Error('Block number did not increase');
+            }
+            return block;
+        }, {
+            retries: 10, // Number of retries
+            factor: 1, // Factor to increase the wait time between retries
+            minTimeout: 1000, // Minimum wait time between retries (in milliseconds)
+            maxTimeout: 5000, // Maximum wait time between retries (in milliseconds)
+            randomize: false // Disable randomization of the wait time
+        });
         if (currentBlock > latestBlock) {
-            const events = await exchangeContract.getPastEvents('SynthExchange', {
-                fromBlock: latestBlock + 1,
-                toBlock: currentBlock
+            const events = await retry(async () => {
+                const curEvents = exchangeContract.getPastEvents('SynthExchange', {
+                    fromBlock: latestBlock + 1,
+                    toBlock: currentBlock
+                });
+                return curEvents;
+            }, {
+                retries: 10, // Number of retries
+                factor: 1, // Factor to increase the wait time between retries
+                minTimeout: 1000, // Minimum wait time between retries (in milliseconds)
+                maxTimeout: 5000, // Maximum wait time between retries (in milliseconds)
+                randomize: false // Disable randomization of the wait time
             });
 
             events.forEach(async (event) => {
                 try {
-                    let ratesData = await exchangeRatesContract.methods.effectiveValueAndRates(event.returnValues.fromCurrencyKey, event.returnValues.fromAmount, event.returnValues.toCurrencyKey).call();
+                    let ratesData = await retry(async () => {
+                        const exchangeRates = exchangeRatesContract.methods.effectiveValueAndRates(event.returnValues.fromCurrencyKey, event.returnValues.fromAmount, event.returnValues.toCurrencyKey).call();
+                        return exchangeRates;
+                    }, {
+                        retries: 10, // Number of retries
+                        factor: 1, // Factor to increase the wait time between retries
+                        minTimeout: 1000, // Minimum wait time between retries (in milliseconds)
+                        maxTimeout: 5000, // Maximum wait time between retries (in milliseconds)
+                        randomize: false // Disable randomization of the wait time
+                    });
                     let fromAmountInUSD = event.returnValues.fromAmount * ratesData.sourceRate / 10 ** 36;
                     let toAmountInUSD = event.returnValues.toAmount  * ratesData.destinationRate / 10 ** 36;
                     let timestamp = new Date();
