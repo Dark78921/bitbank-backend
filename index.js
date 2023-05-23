@@ -41,9 +41,6 @@ async function initialize() {
     setInterval(async () => {
         const currentBlock = await retry(async () => {
             const block = await web3.eth.getBlockNumber();
-            if (block <= latestBlock) {
-                throw new Error('Block number did not increase');
-            }
             return block;
         }, {
             retries: 10, // Number of retries
