@@ -9,7 +9,7 @@ const mongoURI = 'mongodb+srv://haraki:Bethebest123!@cluster0.bgr1lex.mongodb.ne
 const dbName = 'bitbank'; // Replace with your database name
 const collectionName = 'exchange'; // Replace with your collection name
 
-const web3 = new Web3(new Web3.providers.HttpProvider('https://erpc.apothem.network'));
+const web3 = new Web3(new Web3.providers.HttpProvider('https://erpc.apothem.network', { timeout: 10000 }));
 const exchangeAddress = '0x2f78fc77fF3DfeFD469af6e21D2d1ad84216BC9c';
 const exchangeRatesAddress = "0x9739146C93a21277F84B8cf60422E9C7f3e0BBF9";
 const exchangeABI = require('./abi/bitbank.json'); // Replace with your smart contract ABI
