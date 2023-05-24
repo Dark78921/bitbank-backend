@@ -2,6 +2,7 @@ const express = require('express');
 const { MongoClient } = require('mongodb');
 const Web3 = require('web3');
 const retry = require('async-retry');
+const cors = require('cors');
 
 const app = express();
 const port = 5000; // Replace with your desired port number
@@ -109,6 +110,8 @@ async function initialize() {
 }
 
 initialize().catch(console.error);
+
+app.use(cors());
 
 app.get('/exchange', async (req, res) => {
     try {
